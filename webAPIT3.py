@@ -30,7 +30,7 @@ def temp_c(data):
 # Call temp_c(data) for computed temperature
 
 # Select pins
-pinset = (0, 2, 4, 5, 12, 13, 14, 21, 22, 23, 32)
+pinset = (0, 2, 4, 5, 12, 14, 15, 21, 22, 23, 32)
 pins = [Pin(i, Pin.IN) for i in pinset]
 pinlist = []
 for i in pinset:
@@ -52,11 +52,10 @@ while True:
     client, addr = s.accept()
     print('Client connected from', addr)
     cl_file = client.makefile('rwb', 0)
+    
     response = html
     while True:
         line = cl_file.readline()
-        # get temperature kinda
-
         # GET Request is found
         if line.find(b'GET') != -1:
             # Transform to string, go in between GET and HTTP
@@ -163,14 +162,30 @@ while True:
                         response = json.dumps(
                             {"error": "No such pin exists."})
 
-            # elif pathlist[1]=='/toggle':
+            if len(pathlist[1]) > 1:
+                client.send("Content-Type: application/json\n")
         # POST Request is found
         # elif line.find(b'POST')!=-1:
         # DELETE Request is found
         # elif line.find(b'DELETE')!=-1:
+        elif line.find(b'POST') != -1:
+            # Transform to string, go in between PATCH and HTTP
+            # strip() used to remove whitespaces in the path
+            respath = str(line).split('POST')[1].split('HTTP')[0].strip()
+            #Set status code
+            client.send("HTTP/1.1 200 OK\n")
+            
+            pair = respath.split('?p')[1].split('=')
+            pinno = int(pair[0])
+            pinval = int(pair[1])
+            led = Pin(pinno,Pin.OUT)
+            led.value(pinval)
+            print("LED Toggled")
+    
+            client.send("Content-Location: "+respath)
+            response = ""
+        print(line)
         if not line or line == b'\r\n':
             break
-    if len(pathlist[1]) > 1:
-        client.send("Content-Type: application/json\n")
     client.send("\n"+response)
     client.close()
