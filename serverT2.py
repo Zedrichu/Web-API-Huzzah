@@ -67,7 +67,6 @@ while True:
     while True:
         #Checks for the EOF
         line = cl_file.readline()
-        print(line)
         if not line or line == b'\r\n':
             break
     #Create rows in the HTML table for each pin and it's value
