@@ -1,8 +1,10 @@
+
 import json
 import requests
+from requests.api import head
 
 items = ['Get value of a specific pin.', 'Toggle red LED.', 'Toggle orange LED.',
-         'Toggle green LED.', 'Change NEOPIXELS color.', 'Quit.']
+         'Toggle green LED.', 'Change NEOPIXEL color.', 'Quit.']
 
 
 def menu():
@@ -35,12 +37,17 @@ while True:
         try:
             print(request['error'])
         except:
-            val = '?p15='+str(1-request['value'])
-            header = {'Content-Type':'application/json'}
-            request = requests.post(
-                'http://192.168.4.1/post'+val,headers=header)
-            print(request.status_code)
-            print('Red LED toggled successfully')
+            pass
+        val = '?p15='+str(1-request['value'])
+        header = {'Content-Type':'application/json'}
+        request = requests.post(
+            'http://192.168.4.1/post'+val,headers=header)
+        print(request.status_code)
+        request = request.json()
+        try:
+            print(request['error'])
+        except:
+            print('Red '+request['success'])
         
     elif choice == 3:
         #ORANGE Led in pin 32
@@ -49,12 +56,17 @@ while True:
         try:
             print(request['error'])
         except:
-            val = '?p32='+str(1-request['value'])
-            header = {'Content-Type':'application/json'}
-            request = requests.post(
-                'http://192.168.4.1/post'+val,headers=header)
-            print(request.status_code)
-            print('Orange LED toggled successfully')
+            pass
+        val = '?p32='+str(1-request['value'])
+        header = {'Content-Type':'application/json'}
+        request = requests.post(
+            'http://192.168.4.1/post'+val,headers=header)
+        print(request.status_code)
+        request = request.json()
+        try:
+            print(request['error'])
+        except:
+            print('Orange '+request['success'])
             
     elif choice == 4:    
         #GREEN Led in pin 21
@@ -69,13 +81,30 @@ while True:
         request = requests.post(
             'http://192.168.4.1/post'+val,headers=header)
         print(request.status_code)
-        print('Green LED toggled successfully')
-        
+        request = request.json()
+        try:
+            print(request['error'])
+        except:
+            print('Green '+request['success'])
     
-    #elif choice == 5:
-        #NEOPIXEL Led in pin --
-    
-    #elif choice == 6:
+    elif choice == 5:
+        #NEOPIXEL Led in pin 4
+        try:
+            vred = int(input("Type red led value (0-255): "))
+            vgreen = int(input("Type green led value (0-255): "))
+            vblue = int(input("Type blue led value (0-255): "))
+        except:
+            pass
+        val = '?neo=%d-%d-%d' % (vred,vgreen,vblue)
+        header = {'Content-Type':'application/json'}
+        request = requests.post(
+            'http://192.168.4.1/post'+val,headers=header)
+        print(request.status_code)
+        request = request.json()
+        try:
+            print(request['error'])
+        except:
+            print(request['success'])
         
     else:
         break
